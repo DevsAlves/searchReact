@@ -1,7 +1,7 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
-function App() {
-  const datas = [
+
+const datas = [
     "React",
     "JavaScript",
     "TypeScript",
@@ -12,39 +12,39 @@ function App() {
     "Go",
   ];
 
-  const [digited, setDigitado] = useState([]); // Valor do usuário
-  const [filterValue, setFilterValue] = useState(digited); //Filtro
 
-  // Função que faz a busca
-  function searchValues(e) {
-    e.preventDefault();
+function App() {
+  const [digited, setDigitado] = useState(""); // Valor do usuário
 
-    const newDatas = datas.filter((data) =>
-      data.toLowerCase().includes(digited.toLowerCase()),
-    );
-    setFilterValue(newDatas);
-  }
+  // Função que faz a busca no array
+  const searchValues = useMemo(() => {
+    const lowerDigited = digited.toLowerCase();
+    return datas.filter((data) => data.toLowerCase().includes(lowerDigited));
+  }, [digited]);
 
   return (
     <div>
       <h2>Busca em Lista</h2>
-
-      <form onSubmit={searchValues}>
-         <input
+      <input
         type="text"
         placeholder="Digite algo"
+        value={digited}
         onChange={(e) => {
           setDigitado(e.target.value);
         }}
       />
-      <button>Buscar</button>
-      </form>
-     
 
       <div>
-        {digited === "" ? ( datas.map((data, index) => <li key={index}>{data}</li>) ) : filterValue.length === 0 ? ( <p>Nenhum resultado </p> ) : ( filterValue.map((data, index) => <li key={index}>{data}</li>) )}
+        {
+          digited === "" ? (
+            searchValues.map((data, index) => <li key={index}>{data}</li>) //Retorna a lista toda 
+          ) : searchValues.length === 0 ? (
+            <p>Nenhum resultado encontrado </p>
+          ) : (
+            searchValues.map((data, index) => <li key={index}>{data}</li>)
+          ) // Retorna o valor que foi encontrado depois da busca
+        }
       </div>
-
     </div>
   );
 }
